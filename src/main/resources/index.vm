@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Summary search</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".search_cv").css({
+                "height": "20px",
+                "width": "250px"
+            })
+            $(".line").css({
+                "float": "left",
+                "width": "20%",
+                "height": "400px"
+            })
+            $("#search_summary").css({
+                "float": "left",
+                "width": "60%",
+                "height": "400px"
+            })
+            $("#header").css({
+                "width": "100%",
+                "height": "80px",
+                "backgroundColor": "black",
+                "color": "white",
+                "text-align": "center",
+                "font-size": "-webkit-xxx-large"
+            })
+            $("#go_btn").css({
+                "width": "100%",
+                "height": "30px",
+                "margin-top": "5px"
+            })
+            $(".search_cv").css({
+                "width": "49%",
+                "background-image": "url(http://img1.rabota.com.ua/static/2014/04/magnifier.png)",
+                "background-position": "97% 50%",
+                "background-repeat": "no-repeat"
+            })
+            $("#search_result").css({
+                "text-align": "center",
+                "margin-top": "25px"
+            })
+            $("#search_summary_form").css({
+                "text-align": "center",
+                "margin-top": "20px"
+            })
+        })
+    </script>
+    <script>
+
+    </script>
+</head>
+<body>
+<div id="header">Search summary. Synchronized with rabota.ua</div>
+<div class="line"></div>
+<div id="search_summary">
+    <form id="search_summary_form" action="/find/cv_list">
+        <input class="search_cv" type="text" name="desc" placeholder="Job position keyword eg Java"
+               style="
+               "/>
+        <input class="search_cv" type="text" name="loc" placeholder="Location eg Харьков"/>
+        <br/>
+        <input type="submit" id="go_btn" name="GO" value="GO"/>
+    </form>
+    <div id="search_result">
+        #if(!$msg)
+
+            #foreach( $cv in $summaries)
+                <h3 class="r"><a
+                        href="/cv?cv_id=$cv.id"
+                        onmousedown="return rwt(this,'','','','1','AFQjCNEfRdcTSTEiGoJZ-7U8i3cpDUW3_g','wsVREIDIqNMd20zJHRTnmg','0CB4QFjAA','','',event)"
+                    ">$cv.jobPosition</a></h3>
+            #end
+        #else $msg
+        #end
+    </div>
+</div>
+<div class="line"></div>
+</body>
+</html>

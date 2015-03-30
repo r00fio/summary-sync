@@ -1,0 +1,52 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin:'application'
+
+version = '1.0'
+compileJava.options.fork = true
+def javaHome ='/usr/lib/jvm/java-8x64-oracle/bin/javac'
+compileJava.options.forkOptions.executable = javaHome
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+
+sourceSets {
+    main.java.srcDirs += 'src/main/java'
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'org.unitils', name: 'unitils-core', version: '3.4.2'
+    compile group: 'com.sparkjava', name: 'spark-core', version: '2.1'
+    compile group: 'org.mongodb', name: 'mongo-java-driver', version: '2.13.0'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
+    compile group: 'com.sparkjava', name: 'spark-template-velocity', version: '2.0.0'
+    compile group: 'com.google.guava', name: 'guava', version:'18.0'
+    compile 'com.google.code.gson:gson:2.3',
+            'org.slf4j:slf4j-api:1.7.2'
+}
+task printProperties <<{
+    println "          ||      ||                      ||                         \n" +
+            "          ||      ||                      ||     ''                  \n" +
+            " '''|.  ''||''  ''||''  .|''|, `||''|,  ''||''   ||  .|''|, `||''|,  \n" +
+            ".|''||    ||      ||    ||..||  ||  ||    ||     ||  ||  ||  ||  ||  \n" +
+            "`|..||.   `|..'   `|..' `|...  .||  ||.   `|..' .||. `|..|' .||  ||. "
+    println "  ========================================================="
+    println "|| This project is uses Java 8.                            ||\n" +
+            "|| Please change the javaHome property in build.gradle to  || \n" +
+            "|| point to the appropriate versions of javac              || \n" +
+            "|| Or you can pass a path to to Java 8 as a task parameter ||"
+    println "  ========================================================="
+    println "|| javaHome = "+ javaHome
+    println "  ========================================================="
+}
+
+run(){
+    printProperties.execute()
+    mainClassName = "Main"
+}

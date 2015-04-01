@@ -9,9 +9,7 @@ import provider.SummaryProvider;
 import provider.SummaryProviderException;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.*;
 
 /**
  * Created by pixel on 3/28/15.
@@ -20,18 +18,24 @@ public class SummaryService {
     private static final Logger log = LoggerFactory.getLogger(SummaryService.class);
     private final SummaryDAO summaryDAO;
     private final SummaryProvider summaryProvider;
-    private static final ExecutorService executorGroup = Executors.newCachedThreadPool();
+    private final InsertSummaryTask summaryPersistScheduler;
+    public static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+    public static final long TASKS_START_UP_DELAY = 10000;
+    public static final long TASK_TIME_SLICE = 10000;
 
     public SummaryService(SummaryDAO summaryDAO, SummaryProvider summaryProvider) {
         this.summaryProvider = summaryProvider;
         this.summaryDAO = summaryDAO;
+        summaryPersistScheduler = new InsertSummaryTask(summaryDAO);
+        executor.scheduleAtFixedRate(summaryPersistScheduler,TASKS_START_UP_DELAY, TASK_TIME_SLICE, TimeUnit.MILLISECONDS);
     }
 
     public Summary getAndPersistSummary(String summaryId) throws SummaryServiceException {
         Summary summary = summaryDAO.findById(summaryId);
         if (summary == null) {
             summary = summaryProvider.getSummary(summaryId);
-            putSummary(summary);
+            summaryPersistScheduler.addSummary(summary);
         }
         return summary;
     }
@@ -46,20 +50,4 @@ public class SummaryService {
             throw new SummaryServiceException("Can't retrieve summaries due to provider exception", e);
         }
     }
-
-    /**
-     * @param summary
-     * @throws SummaryServiceException
-     */
-    public void putSummary(Summary summary) throws SummaryServiceException {
-        // insert in new thread because long running task
-        // will block jetty selector
-        try {
-            executorGroup.execute(new InsertSummaryTask(summary, summaryDAO));
-        } catch (RejectedExecutionException e) {
-            log.error("Couldn't insert summary ", e);
-            throw new SummaryServiceException("Couldn't insert summary", e);
-        }
-    }
-
 }

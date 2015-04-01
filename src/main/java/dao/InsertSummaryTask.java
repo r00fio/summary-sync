@@ -2,6 +2,9 @@ package dao;
 
 import com.mongodb.MongoException;
 import entity.Summary;
+import org.eclipse.jetty.util.ConcurrentHashSet;
+
+import java.util.Iterator;
 
 /**
  * Created by pixel on 3/27/15.
@@ -9,17 +12,25 @@ import entity.Summary;
 public class InsertSummaryTask implements Runnable {
 
     private SummaryDAO summaryDAO;
-    private final Summary summary;
+    public static final ConcurrentHashSet<Summary> SUMMARIES = new ConcurrentHashSet<>();
 
-    public InsertSummaryTask(Summary summary, SummaryDAO summaryDAO) {
+    public InsertSummaryTask(SummaryDAO summaryDAO) {
         this.summaryDAO = summaryDAO;
-        this.summary = summary;
+    }
+
+    public static boolean addSummary(Summary summary) {
+        return SUMMARIES.add(summary);
     }
 
     @Override
     public void run() {
         try {
-            summaryDAO.insert(summary);
+            Iterator<Summary> iterator = SUMMARIES.iterator();
+            while (iterator.hasNext()) {
+                Summary next = iterator.next();
+                iterator.remove();
+                summaryDAO.insert(next);
+            }
         } catch (MongoException e) {
             e.printStackTrace();
         }
